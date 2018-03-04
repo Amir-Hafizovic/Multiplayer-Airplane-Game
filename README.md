@@ -19,5 +19,5 @@ Browserify is setup to transform both ES6 Javascript and ```glslify``` for GLSL 
 
 #### This projects uses some elements of the following
 
-THREE Multiplayer boilerplate https://github.com/juniorxsound/THREE-Multiplayer
-model plane from https://github.com/14islands/aeronaut
+* THREE Multiplayer boilerplate https://github.com/juniorxsound/THREE-Multiplayer
+* model plane from https://github.com/14islands/aeronaut

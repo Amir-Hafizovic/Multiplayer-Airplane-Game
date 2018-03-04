@@ -42,7 +42,7 @@ socket.on('introduction', (_id, _clientNum, _ids) => {
       let airplane = new Airplane(randomColor());
       airplane.mesh.scale.set(0.01, 0.01, 0.01);
 
-      airplane.mesh.rotation.y = 1.5;
+      //airplane.mesh.rotation.y = 1.5;
 
 
       clients[_ids[i]] = {
