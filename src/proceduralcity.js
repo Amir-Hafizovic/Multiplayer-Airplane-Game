@@ -1,4 +1,4 @@
-module.exports = (THREE) =>{
+module.exports = (THREE, renderer) =>{
 	// build the base geometry for each building
 	var geometry = new THREE.CubeGeometry( 1, 1, 1 );
 	// translate the geometry to place the pivot point at the bottom instead of the center

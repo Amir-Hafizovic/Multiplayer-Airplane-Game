@@ -28,7 +28,7 @@ glScene.on('userMoved', () => {
     glScene.camera.rotation.y,
     glScene.camera.rotation.z,
   ];
-  console.log(newRotation);
+  console.log('newRotation',newRotation);
   socket.emit('move', newPosition, newRotation);
 });
 
@@ -40,9 +40,9 @@ socket.on('introduction', (_id, _clientNum, _ids) => {
       // const planeStartY = 200
       // const planeStartZ = 0
       let airplane = new Airplane(randomColor());
-      airplane.mesh.scale.set(0.01, 0.01, 0.01);
+      // airplane.mesh.scale.set(0.01, 0.01, 0.01);
 
-      //airplane.mesh.rotation.y = 1.5;
+      //q
 
 
       clients[_ids[i]] = {
@@ -50,8 +50,23 @@ socket.on('introduction', (_id, _clientNum, _ids) => {
       }
 
       //Add initial users to the scene
-      glScene.scene.add(clients[_ids[i]].airplane);
-      console.log(`ap X: ${airplane.mesh.rotation.x} ap Y: ${airplane.mesh.rotation.y} ap Z: ${airplane.mesh.rotation.z}`);
+
+      if(_ids[i] === _id) {
+        // this model is for the current user/current browser,
+        // so add it as a child of the camera
+         glScene.camera.add(clients[_ids[i]].airplane);
+         clients[_ids[i]].airplane.position.z -= 1.5;
+         clients[_ids[i]].airplane.position.y -= .5;
+         glScene.scene.add( glScene.camera );
+      } else {
+        // add model for *other* players to the scene
+        glScene.scene.add(clients[_ids[i]].airplane);
+      }
+
+
+      // glScene.camera.add(clients[_ids[i]].airplane);
+      // clients[_ids[i]].airplatydne.position.set(-2,0,0);
+      // console.log('OBJPOS:', clients[_ids[i]].airplane.position);
     // }
   }
 
@@ -76,7 +91,7 @@ socket.on('newUserConnected', (clientCount, _id, _ids) => {
     // const planeStartY = 200
     // const planeStartZ = 0
     let airplane = new Airplane(randomColor());
-    airplane.mesh.scale.set(0.01, 0.01, 0.01);
+    // airplane.mesh.scale.set(0.01, 0.01, 0.01);
     // airplane.mesh.position.y = 2000 + planeStartY
     clients[_id] = {
       airplane: airplane.mesh

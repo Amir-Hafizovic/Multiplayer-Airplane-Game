@@ -1,5 +1,6 @@
 //Three.js
 import * as THREE from 'three';
+import Stats from 'stats.js';
 //import Airplane from './airplane';
 // import ProceduralCity from './proceduralcity';
 //import FirstPersonControls from './fpscontrols';
@@ -45,7 +46,12 @@ class Scene extends EventEmitter {
 
     if(hasControls){
       // this.controls = new THREE.FirstPersonControls(this.camera, this.renderer.domElement);
-      this.controls = new THREE.FlyControls(this.camera, this.renderer.domElement);
+      this.controls = new THREE.FlyControls(
+        this.camera,
+        this.renderer.domElement,
+        () => this.emit('userMoved')
+      );
+
       //this.controls.lookSpeed = 0.15;
       this.controls.dragToLook = true;
       this.controls.movementSpeed = 5;
@@ -123,26 +129,39 @@ class Scene extends EventEmitter {
 				var sky = new THREE.Mesh( skyGeo, skyMat );
 				this.scene.add( sky );
 
-        // var city  = ProceduralCity();
+        this.addStats = function(){
+        const stats = new Stats();
+        stats.setMode(0);
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '0px';
+        stats.domElement.style.top = '0px';
+
+        document.getElementById('stats').appendChild(stats.domElement);
+
+        return stats;
+        };
+        this.stats = this.addStats();
+
+        // var city  = new ProceduralCity(THREE, this.renderer);
         // this.scene.add(city);
 
     this.update();
 
   }
 
-  drawUsers(positions, id){
-    for(let i = 0; i < Object.keys(positions).length; i++){
-      if(Object.keys(positions)[i] != id){
-        this.users[i].position.set(positions[Object.keys(positions)[i]].position[0],
-                                   positions[Object.keys(positions)[i]].position[1],
-                                   positions[Object.keys(positions)[i]].position[2]);
-      }
-    }
-  }
+  // drawUsers(positions, id){
+  //   for(let i = 0; i < Object.keys(positions).length; i++){
+  //     if(Object.keys(positions)[i] != id){
+  //       this.users[i].position.set(positions[Object.keys(positions)[i]].position[0],
+  //                                  positions[Object.keys(positions)[i]].position[1],
+  //                                  positions[Object.keys(positions)[i]].position[2]);
+  //     }
+  //   }
+  // }
 
   update(){
     requestAnimationFrame(() => this.update());
-
+    this.stats.update();
 
     this.controls.update(this.clock.getDelta());
     this.controls.target = new THREE.Vector3(0,0,0);

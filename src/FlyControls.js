@@ -2,7 +2,7 @@
  * @author James Baicoianu / http://www.baicoianu.com/
  */
 module.exports = (THREE) =>{
-	THREE.FlyControls = function ( object, domElement ) {
+	THREE.FlyControls = function ( object, domElement, moveCallback=null) {
 
 		this.object = object;
 
@@ -149,6 +149,11 @@ module.exports = (THREE) =>{
 
 				this.moveState.yawLeft   = - ( ( event.pageX - container.offset[ 0 ] ) - halfWidth  ) / halfWidth;
 				this.moveState.pitchDown =   ( ( event.pageY - container.offset[ 1 ] ) - halfHeight ) / halfHeight;
+
+				if(moveCallback){
+					moveCallback();
+				}
+
 
 				this.updateRotationVector();
 
