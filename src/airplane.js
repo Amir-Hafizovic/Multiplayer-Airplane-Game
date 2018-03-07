@@ -131,10 +131,12 @@ class AirPlane {
     // rotate the geometry on the Y axis away from the camera
     //this.mesh.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI / 2))
 
+
+
     // change rotation order to avoid gimbal lock
-      this.mesh.rotation.order = 'XYZ';
-      this.mesh.rotation.y = 0.5 * Math.PI;
-      this.mesh.scale.set(0.01, 0.01, 0.01);
+    this.mesh.rotation.order = 'XYZ';
+    this.mesh.rotation.y = 0.5 * Math.PI;
+    this.mesh.scale.set(0.01, 0.01, 0.01);
   }
 }
 

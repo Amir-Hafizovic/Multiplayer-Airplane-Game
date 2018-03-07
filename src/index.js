@@ -28,7 +28,10 @@ glScene.on('userMoved', () => {
     glScene.camera.rotation.y,
     glScene.camera.rotation.z,
   ];
-  console.log('newRotation',newRotation);
+
+  // console.log('POSITION',newPosition);
+  console.log('MY ROTATION', newRotation);
+  console.log('MY POSITION', newPosition);
   socket.emit('move', newPosition, newRotation);
 });
 
@@ -55,19 +58,32 @@ socket.on('introduction', (_id, _clientNum, _ids) => {
         // this model is for the current user/current browser,
         // so add it as a child of the camera
          glScene.camera.add(clients[_ids[i]].airplane);
-         clients[_ids[i]].airplane.position.z -= 1.5;
+         glScene.camera.rotation.x = 0.1 * Math.PI;
+         glScene.camera.rotation.y = 1.2 * Math.PI;
+         glScene.camera.position.y = 100;
+         glScene.camera.position.z = -100;
+         glScene.camera.position.x = -100;
+         // glScene.camera.axes = new THREE.AxesHelper( 40 );
+         // glScene.scene.add( glScene.camera.axes );
+         console.log('CAMERA ROT',glScene.camera.rotation);
+         console.log('CAMERA POS',glScene.camera.position);
+
+         clients[_ids[i]].airplane.position.z -= 2.2;
          clients[_ids[i]].airplane.position.y -= .5;
+         // clients[_ids[i]].airplane.rotation.y = 0.5 * Math.PI;
+         // glScene.camera.rotation.y = -0.5 * Math.PI;
          glScene.scene.add( glScene.camera );
+
+         console.log('starting airplane rot', clients[_ids[i]].airplane.rotation);
+         console.log('starting airplane pos', clients[_ids[i]].airplane.position);
       } else {
         // add model for *other* players to the scene
+        clients[_ids[i]].airplane.rotation.y = 0.5 * Math.PI;
         glScene.scene.add(clients[_ids[i]].airplane);
+
+        console.log('his starting rot', clients[_ids[i]].airplane.rotation);
+        console.log('his starting pos', clients[_ids[i]].airplane.position);
       }
-
-
-      // glScene.camera.add(clients[_ids[i]].airplane);
-      // clients[_ids[i]].airplatydne.position.set(-2,0,0);
-      // console.log('OBJPOS:', clients[_ids[i]].airplane.position);
-    // }
   }
 
   console.log(clients);
@@ -99,7 +115,6 @@ socket.on('newUserConnected', (clientCount, _id, _ids) => {
 
     //Add initial users to the scene
     glScene.scene.add(clients[_id].airplane);
-    console.log(`ap X: ${airplane.mesh.rotation.x} ap Y: ${airplane.mesh.rotation.y} ap Z: ${airplane.mesh.rotation.z}`);
   }
   //airplane.propeller.rotation.x += 0.3
 });
@@ -120,8 +135,11 @@ socket.on('connect', ()=>{});
 //Update when one of the users moves in space
 // props sent contain position and rotation of the other users' camera
 socket.on('userPositions', _clientProps => {
+  console.log('USER MOVED');
   for(let i = 0; i < Object.keys(_clientProps).length; i++) {
     if(Object.keys(_clientProps)[i] != id) {
+
+      console.log('UPDATING AIRPLANE');
 
       const currentProps = Object.keys(_clientProps)[i];
 
@@ -141,6 +159,11 @@ socket.on('userPositions', _clientProps => {
       lerpedRot.x = THREE.Math.lerp(oldRot.x, newRot[0], 0.3);
       lerpedRot.y = THREE.Math.lerp(oldRot.y, newRot[1], 0.3);
       lerpedRot.z = THREE.Math.lerp(oldRot.z, newRot[2], 0.3);
+
+      // console.log('OTHER Position');
+      // console.log(oldPos, newPos);
+      console.log('His Rotation OLD', oldRot);
+      console.log('His Rotation NEW', newRot);
 
       //Set the position and rotation
       clients[currentProps].airplane.position.set(lerpedPos.x, lerpedPos.y, lerpedPos.z);
