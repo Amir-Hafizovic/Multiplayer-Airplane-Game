@@ -10,8 +10,9 @@ module.exports = (THREE) =>{
 		if ( domElement ) this.domElement.setAttribute( 'tabindex', - 1 );
 
 		// API
-
-		this.movementSpeed = 1.0;
+		this.baseSpeed = 15;
+		this.maxSpeed = 45;
+		this.movementSpeed = 15;
 		this.rollSpeed = 0.005;
 
 		this.dragToLook = false;
@@ -40,6 +41,7 @@ module.exports = (THREE) =>{
 		};
 
 		this.keydown = function( event ) {
+			// console.log('keydown');
 
 			if ( event.altKey ) {
 
@@ -53,7 +55,13 @@ module.exports = (THREE) =>{
 
 				case 16: /* shift */ this.movementSpeedMultiplier = .1; break;
 
-				case 87: /*W*/ this.moveState.forward = 1; break;
+				case 87: /*W*/
+					this.moveState.forward = 1;
+					if (this.movementSpeed < this.maxSpeed)  {
+						this.movementSpeed += 2;
+					}
+					// console.log('changed speed', this.movementSpeed);
+					break;
 				case 83: /*S*/ this.moveState.back = 1; break;
 
 				case 65: /*A*/ this.moveState.left = 1; break;
@@ -84,7 +92,14 @@ module.exports = (THREE) =>{
 
 				case 16: /* shift */ this.movementSpeedMultiplier = 1; break;
 
-				case 87: /*W*/ this.moveState.forward = 0; break;
+				case 87: /*W*/ this.moveState.forward = 0;
+				while (this.movementSpeed > this.baseSpeed) {
+					//console.log('back to bases', this.movementSpeed);
+					this.movementSpeed -= .1;
+				}
+				// console.log('Basespeed',this.baseSpeed);
+				// console.log('speed',this.movementSpeed);
+				break;
 				case 83: /*S*/ this.moveState.back = 0; break;
 
 				case 65: /*A*/ this.moveState.left = 0; break;

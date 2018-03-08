@@ -5,7 +5,7 @@ class Background {
     this.scene = scene;
 
     this.scene.background = new THREE.Color().setHSL( 0.6, 0, 1 );
-    // this.scene.fog = new THREE.Fog( this.scene.background, 1, 1000 );
+    // this.scene.fog = new THREE.Fog( this.scene.background, 1, 1100 );
 
     var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
       hemiLight.color.setHSL( 0.6, 1, 0.6 );
@@ -38,7 +38,7 @@ class Background {
       groundMat.color.setHSL( 0.095, 1, 0.75 );
       var ground = new THREE.Mesh( groundGeo, groundMat );
       ground.rotation.x = -Math.PI/2;
-      ground.position.y = -33;
+      ground.position.y = -0.1;
       this.scene.add( ground );
       ground.receiveShadow = true;
       // SKYDOME
@@ -52,7 +52,7 @@ class Background {
       };
       uniforms.topColor.value.copy( hemiLight.color );
       // this.scene.fog.color.copy( uniforms.bottomColor.value );
-      var skyGeo = new THREE.SphereGeometry( 800, 32, 15 );
+      var skyGeo = new THREE.SphereGeometry( 1000, 32, 15 );
       var skyMat = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniforms, side: THREE.BackSide } );
       var sky = new THREE.Mesh( skyGeo, skyMat );
       this.scene.add( sky );

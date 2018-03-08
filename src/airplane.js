@@ -137,6 +137,12 @@ class AirPlane {
     this.mesh.rotation.order = 'XYZ';
     this.mesh.rotation.y = 0.5 * Math.PI;
     this.mesh.scale.set(0.01, 0.01, 0.01);
+
+
+
+    // while (true){
+    //     this.mesh.propeller.rotation.x += 0.3
+    // };
   }
 }
 

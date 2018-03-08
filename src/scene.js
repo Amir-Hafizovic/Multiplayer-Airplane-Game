@@ -31,7 +31,8 @@ class Scene extends EventEmitter {
     this.height = _height;
 
     //THREE Camera
-    this.camera = new THREE.PerspectiveCamera(50, this.width / this.height, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(50, this.width / this.height, 0.1, 1500);
+    // window.camera = this.camera;
 
     //THREE WebGL renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -45,7 +46,7 @@ class Scene extends EventEmitter {
     //Push the canvas to the DOM
     domElement.append(this.renderer.domElement);
 
-    if(hasControls){
+    if(hasControls) {
       // this.controls = new THREE.FirstPersonControls(this.camera, this.renderer.domElement);
       this.controls = new THREE.FlyControls(
         this.camera,
@@ -54,28 +55,31 @@ class Scene extends EventEmitter {
       );
 
       //this.controls.lookSpeed = 0.15;
-      this.controls.dragToLook = false;
-      this.controls.movementSpeed = 20;
+      this.controls.dragToLook = true;
       this.controls.rollSpeed = 0.5;
-      this.autoForward = false;
+      this.controls.autoForward = false;
+      // this.controls.movementSpeed = 20;
     }
+
+    this.raycaster = new THREE.Raycaster();
+    this.raycaster.far = 500;
+    this.mouse = new THREE.Vector2();
+
+    window.addEventListener( 'mousemove', e => this.onMouseMove(e), false );
 
     //Setup event listeners for events and handle the states
     window.addEventListener('resize', e => this.onWindowResize(e), false);
     domElement.addEventListener('mouseenter', e => this.onEnterCanvas(e), false);
     domElement.addEventListener('mouseleave', e => this.onLeaveCanvas(e), false);
-    window.addEventListener('keydown', e => this.onKeyDown(e), false);
+    // window.addEventListener('keydown', e => this.onKeyDown(e), false);
 
-    this.helperGrid = new THREE.GridHelper( 50, 50 );
-    this.helperGrid.position.y = -0.5;
-    this.scene.add(this.helperGrid);
+    // this.helperGrid = new THREE.GridHelper( 50, 50 );
+    // this.helperGrid.position.y = -0.5;
+    // this.scene.add(this.helperGrid);
+
     this.clock = new THREE.Clock();
 
-    // var light = new THREE.AmbientLight( 0xFFFFFF ); // soft white light
-    // this.scene.add( light );
-    // const spotlight = new THREE.SpotLight( 0xFFFFFF );
-    // spotlight.position.set( -10, 60, 10 );
-    // this.scene.add(spotlight);
+
     const bg = new Background(this.scene);
     const city = new City(this.scene, this.renderer);
 
@@ -93,22 +97,10 @@ class Scene extends EventEmitter {
         };
         this.stats = this.addStats();
 
-        // var city  = new ProceduralCity(THREE, this.renderer);
-        // this.scene.add(city);
-
     this.update();
 
   }
 
-  // drawUsers(positions, id){
-  //   for(let i = 0; i < Object.keys(positions).length; i++){
-  //     if(Object.keys(positions)[i] != id){
-  //       this.users[i].position.set(positions[Object.keys(positions)[i]].position[0],
-  //                                  positions[Object.keys(positions)[i]].position[1],
-  //                                  positions[Object.keys(positions)[i]].position[2]);
-  //     }
-  //   }
-  // }
 
   update(){
     requestAnimationFrame(() => this.update());
@@ -117,9 +109,40 @@ class Scene extends EventEmitter {
     this.controls.update(this.clock.getDelta());
     this.controls.target = new THREE.Vector3(0,0,0);
     this.render();
+
   }
 
   render() {
+    // update the picking ray with the camera and mouse position
+	// this.raycaster.setFromCamera( this.mouse, this.camera );
+	this.raycaster.set( this.camera.getWorldPosition(), this.camera.getWorldDirection() );
+
+	// calculate objects intersecting the picking ray
+	var intersects = this.raycaster.intersectObjects( this.scene.children );
+  //   this.scene.children.filter( obj => {
+  //   return obj.name === "City" || obj.name === "airplane-enemy";
+  // }));
+    // console.log(intersects.length);
+    if(intersects.length){
+
+      // console.log('intersects', intersects.map( i => i.object.name ));
+      // intersects[ 0 ].object.material.wireframe = true;
+      // console.log(intersects[ 0 ].object.name, intersects[ 0 ].distance);
+
+      if( intersects[ 0 ].object.name === "City" && intersects[ 0 ].distance <= 1 ){
+        console.log('Building hit!!');
+      } else if ( intersects[ 0 ].distance < 300 && intersects[ 0 ].object.name !== "City"){
+        console.log(`%c ENEMY IN SIGHT!! ${intersects[ 0 ].object.name}`, 'color: orange');
+      }
+    }
+
+    // for ( var i = 0; i < intersects.length; i++ ) {
+    //
+    //   console.log('intersects', intersects[ i ]);
+  	// 	// intersects[ i ].object.material.color.set( 0xff0000 );
+    //
+  	// }
+    //keep this
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -137,9 +160,18 @@ class Scene extends EventEmitter {
   onEnterCanvas(e){
     this.controls.enabled = true;
   }
-  onKeyDown(e){
-    this.emit('userMoved');
+  onMouseMove ( event ) {
+
+        // calculate mouse position in normalized device coordinates
+        // (-1 to +1) for both components
+
+        this.mouse.x = ( event.clientX / this.width ) * 2 - 1;
+        this.mouse.y = - ( event.clientY / this.height ) * 2 + 1;
+
   }
+  // onKeyDown(e){
+  //   this.emit('userMoved');
+  // }
 }
 
 export default Scene;

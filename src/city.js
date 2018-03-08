@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+  import * as THREE from 'three';
 
 class City {
   constructor (scene, renderer) {
@@ -8,21 +8,21 @@ class City {
     // const light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
     // light.position.set(0.75, 1, 0.25);
     // this.scene.add(light);
-    const grassPlane = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshBasicMaterial({color: 0x04871d}));
-    grassPlane.rotation.x = -90 *Math.PI/180;
-    grassPlane.position.x = 145;
-    grassPlane.position.z = 145;
-    grassPlane .position.y = -0.1;
-    console.log('GPLANE',grassPlane.rotation);
-    console.log('GPLANEPOS',grassPlane.position);
-    this.scene.add(grassPlane);
+    // const grassPlane = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshBasicMaterial({color: 0x04871d}));
+    // grassPlane.rotation.x = -90 *Math.PI/180;
+    // grassPlane.position.x = 145;
+    // grassPlane.position.z = 145;
+    // grassPlane .position.y = -0.1;
+    // console.log('GPLANE',grassPlane.rotation);
+    // console.log('GPLANEPOS',grassPlane.position);
+    // this.scene.add(grassPlane);
 
     const plane = new THREE.Mesh(new THREE.PlaneGeometry(320, 320), new THREE.MeshBasicMaterial({color: 0x6a6a6a}));
     plane.rotation.x = -90 *Math.PI/180;
     plane.position.x = 145;
     plane.position.z = 145;
-    console.log('PLANE',plane.rotation);
-    console.log('PLANEPOS',plane.position);
+    // console.log('PLANE',plane.rotation);
+    // console.log('PLANEPOS',plane.position);
     this.scene.add(plane);
 
     const buildings = new Buildings();
@@ -46,6 +46,8 @@ class City {
     texture.needsUpdate = true;
 
     const mesh = new THREE.Mesh(city, new THREE.MeshLambertMaterial({map: texture, vertexColors: THREE.VertexColors}));
+
+    mesh.name = "City";
 
     this.scene.add(mesh);
 
