@@ -18,6 +18,7 @@ let id;
 let instances = [];
 let clients = new Object();
 
+
 glScene.on('userMoved', () => {
   const newPosition = [
     glScene.camera.position.x,
@@ -52,11 +53,14 @@ socket.on('introduction', (_id, _clientNum, _ids) => {
       //Add initial users to the scene
 
       if(_ids[i] === _id) {
+        window.airplane = clients[_ids[i]].airplane;
         // this model is for the current user/current browser,
         // so add it as a child of the camera
          glScene.camera.add(clients[_ids[i]].airplane);
          glScene.camera.rotation.x = 0.1 * Math.PI;
          glScene.camera.rotation.y = 1.2 * Math.PI;
+         // glScene.camera.position.y = 5;
+         // glScene.camera.position.z = -45;
          glScene.camera.position.y = 100;
          glScene.camera.position.z = -100;
          glScene.camera.position.x = -100;
@@ -64,28 +68,30 @@ socket.on('introduction', (_id, _clientNum, _ids) => {
          // glScene.scene.add( glScene.camera.axes );
          // console.log('CAMERA ROT',glScene.camera.rotation);
          // console.log('CAMERA POS',glScene.camera.position);
-         var box = new THREE.BoxHelper(airplane.mesh, 0xffff00 );
-         console.log('glscene', glScene)
-         glScene.scene.add( box );
+
+         // var box = new THREE.BoxHelper(airplane.mesh, 0xffff00 );
+         // console.log('glscene', glScene)
+         // glScene.scene.add( box );
 
 
 
          clients[_ids[i]].airplane.position.z -= 2.2;
          clients[_ids[i]].airplane.position.y -= .5;
+         // clients[_ids[i]].airplane.rotation.y = .1 * Math.PI;
          // clients[_ids[i]].airplane.rotation.y = 0.5 * Math.PI;
          // glScene.camera.rotation.y = -0.5 * Math.PI;
          glScene.scene.add( glScene.camera );
          window.camera = glScene.camera;
-
-
          console.log(airplane);
 
          // console.log('starting airplane rot', clients[_ids[i]].airplane.rotation);
          // console.log('starting airplane pos', clients[_ids[i]].airplane.position);
       } else {
         // add model for *other* players to the scene
-        // clients[_ids[i]].airplane.rotation.y = 0.5 * Math.PI;
-        clients[_ids[i]].airplane.position.z += (i * 20);
+        // clients[_ids[i]].airplane.rotation.y = 0.2 * Math.PI;
+        console.log('clients' ,clients[_ids[i]].airplane.rotation);
+        console.log('clientsPOS' ,clients[_ids[i]].airplane.position);
+        clients[_ids[i]].airplane.position.z += (i * 2);
         glScene.scene.add(clients[_ids[i]].airplane);
         clients[_ids[i]].airplane.name = "airplane-enemy";
         // console.log('his starting rot', clients[_ids[i]].airplane.rotation);

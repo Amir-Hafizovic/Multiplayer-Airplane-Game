@@ -1,14 +1,12 @@
 //Three.js
 import * as THREE from 'three';
 import Stats from 'stats.js';
-//import Airplane from './airplane';
-// import ProceduralCity from './proceduralcity';
+// import ModelLoader from './modelloader';
 import Background from './background';
 import City from './city';
 import FlyControls from './FlyControls';
-//FirstPersonControls(THREE);
+import Explode from './explode';
 FlyControls(THREE);
-// ProceduralCity(THREE);
 
 // Event emitter implementation for ES6
 import EventEmitter from 'event-emitter-es6';
@@ -46,6 +44,8 @@ class Scene extends EventEmitter {
     //Push the canvas to the DOM
     domElement.append(this.renderer.domElement);
 
+    this.explosion = false;
+
     if(hasControls) {
       // this.controls = new THREE.FirstPersonControls(this.camera, this.renderer.domElement);
       this.controls = new THREE.FlyControls(
@@ -55,9 +55,9 @@ class Scene extends EventEmitter {
       );
 
       //this.controls.lookSpeed = 0.15;
-      this.controls.dragToLook = true;
+      this.controls.dragToLook = false;
       this.controls.rollSpeed = 0.5;
-      this.controls.autoForward = false;
+      this.controls.autoForward = true;
       // this.controls.movementSpeed = 20;
     }
 
@@ -79,23 +79,33 @@ class Scene extends EventEmitter {
 
     this.clock = new THREE.Clock();
 
+    // const modell = new ModelLoader(this.scene)
+
 
     const bg = new Background(this.scene);
     const city = new City(this.scene, this.renderer);
 
+    this.blocks = new Array();
+		this.blockCount = 30;
 
-        this.addStats = function(){
-        const stats = new Stats();
-        stats.setMode(0);
-        stats.domElement.style.position = 'absolute';
-        stats.domElement.style.left = '0px';
-        stats.domElement.style.top = '0px';
+    for (let i = 0; i < this.blockCount; i++) {
+			this.block = new Explode(this.scene);
+			this.blocks.push(this.block);
+		}
+    console.log('THIS.BLOCK',this.block);
 
-        document.getElementById('stats').appendChild(stats.domElement);
+    this.addStats = function(){
+      const stats = new Stats();
+      stats.setMode(0);
+      stats.domElement.style.position = 'absolute';
+      stats.domElement.style.left = '0px';
+      stats.domElement.style.top = '0px';
 
-        return stats;
-        };
-        this.stats = this.addStats();
+      document.getElementById('stats').appendChild(stats.domElement);
+
+      return stats;
+    };
+    this.stats = this.addStats();
 
     this.update();
 
@@ -108,6 +118,11 @@ class Scene extends EventEmitter {
 
     this.controls.update(this.clock.getDelta());
     this.controls.target = new THREE.Vector3(0,0,0);
+
+    if( window.airplane ) {
+      window.airplane.children[6].rotation.x += 0.9;
+    }
+    // console.log(window.airplane);
     this.render();
 
   }
@@ -123,26 +138,40 @@ class Scene extends EventEmitter {
   //   return obj.name === "City" || obj.name === "airplane-enemy";
   // }));
     // console.log(intersects.length);
-    if(intersects.length){
 
-      // console.log('intersects', intersects.map( i => i.object.name ));
-      // intersects[ 0 ].object.material.wireframe = true;
-      // console.log(intersects[ 0 ].object.name, intersects[ 0 ].distance);
+    // raycaster ARROW
+  // this.scene.remove ( this.arrow );
+  // this.arrow = new THREE.ArrowHelper( this.camera.getWorldDirection(), this.camera.getWorldPosition(), 100, Math.random() * 0xffffff );
+  // this.scene.add( this.arrow );
+
+    if(intersects.length){
 
       if( intersects[ 0 ].object.name === "City" && intersects[ 0 ].distance <= 1 ){
         console.log('Building hit!!');
-      } else if ( intersects[ 0 ].distance < 300 && intersects[ 0 ].object.name !== "City"){
+        //debugger
+        // window.airplane.position.y = +1
+        // this.blocks[i].cube.position = window
+        //this.camera.position.y = 100;
+       // glScene.camera.position.z = -100;
+       // glScene.camera.position.x = -100;
+        this.explosion = true;
+
+      } else if ( intersects[ 0 ].distance < 300 && intersects[ 0 ].object.name === "airplane-enemy"){
         console.log(`%c ENEMY IN SIGHT!! ${intersects[ 0 ].object.name}`, 'color: orange');
       }
     }
+    if (this.explosion){
+      for (let i = 0; i < this.blockCount; i++) {
+        this.blocks[i].loop();
+        // console.log('blocks',this.blocks[i]);
+        if (this.blocks[i].ticks >= 150) {
+          this.explosion = false;
+          console.log('thisBLOCKS',this.blocks[i].cube.position);
+          // debugger
 
-    // for ( var i = 0; i < intersects.length; i++ ) {
-    //
-    //   console.log('intersects', intersects[ i ]);
-  	// 	// intersects[ i ].object.material.color.set( 0xff0000 );
-    //
-  	// }
-    //keep this
+        }
+      };
+    }
     this.renderer.render(this.scene, this.camera);
   }
 
