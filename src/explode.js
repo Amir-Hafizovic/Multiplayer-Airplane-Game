@@ -49,9 +49,9 @@ class Explode {
   	this.zrd = Math.random()*MAX_ROT*2 - MAX_ROT;
 
     //this.cube.position = camera.position
-  	this.cube.position.x = 0;
-  	this.cube.position.y = 5;
-  	this.cube.position.z = -25;
+    this.cube.position.x = 100;
+  	this.cube.position.y = 60;
+  	this.cube.position.z = 125;
 
   	this.cube.rotation.x = Math.random()*360;
   	this.cube.rotation.z = Math.random()*360;

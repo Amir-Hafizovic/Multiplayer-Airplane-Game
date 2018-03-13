@@ -92,7 +92,8 @@ class Scene extends EventEmitter {
 			this.block = new Explode(this.scene);
 			this.blocks.push(this.block);
 		}
-    console.log('THIS.BLOCK',this.block);
+    console.log('THIS.BLOCK', this.block);
+
 
     this.addStats = function(){
       const stats = new Stats();
@@ -160,14 +161,18 @@ class Scene extends EventEmitter {
         console.log(`%c ENEMY IN SIGHT!! ${intersects[ 0 ].object.name}`, 'color: orange');
       }
     }
+
     if (this.explosion){
       for (let i = 0; i < this.blockCount; i++) {
         this.blocks[i].loop();
+        // this.blocks[i].cube.position.set(window.scene.camera.position);
+        // debugger
+
         // console.log('blocks',this.blocks[i]);
         if (this.blocks[i].ticks >= 150) {
-          this.explosion = false;
+          this.explosion = this.blocks[i].reset();
+
           console.log('thisBLOCKS',this.blocks[i].cube.position);
-          // debugger
 
         }
       };
