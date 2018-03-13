@@ -48,10 +48,11 @@ class Explode {
   	this.xrd = Math.random()*MAX_ROT*2 - MAX_ROT;
   	this.zrd = Math.random()*MAX_ROT*2 - MAX_ROT;
 
-    //this.cube.position = camera.position
-    this.cube.position.x = 100;
-  	this.cube.position.y = 60;
-  	this.cube.position.z = 125;
+    // textchimp
+    this.cube.position.x = 0; //100;
+    this.cube.position.y = 0; //60;
+    this.cube.position.z = 0; //125;
+    // /textchimp
 
   	this.cube.rotation.x = Math.random()*360;
   	this.cube.rotation.z = Math.random()*360;

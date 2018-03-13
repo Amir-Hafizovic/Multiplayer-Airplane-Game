@@ -88,12 +88,14 @@ class Scene extends EventEmitter {
     this.blocks = new Array();
 		this.blockCount = 30;
 
+    this.splodeGroup = new THREE.Object3D(); // textchimp
     for (let i = 0; i < this.blockCount; i++) {
 			this.block = new Explode(this.scene);
-			this.blocks.push(this.block);
+      this.splodeGroup.add( this.block.cube );  // textchimp
+      this.blocks.push(this.block);
 		}
     console.log('THIS.BLOCK', this.block);
-
+    this.scene.add(this.splodeGroup);  // textchimp
 
     this.addStats = function(){
       const stats = new Stats();
@@ -147,36 +149,54 @@ class Scene extends EventEmitter {
 
     if(intersects.length){
 
-      if( intersects[ 0 ].object.name === "City" && intersects[ 0 ].distance <= 1 ){
+      if( intersects[ 0 ].object.name === "City" && intersects[ 0 ].distance <= 5 ){
         console.log('Building hit!!');
-        //debugger
+
+        // textchimp
+        this.camera.children[0].position.set(1000, 1000, 1000);
+        this.splodeGroup.position.setFromMatrixPosition( this.camera.matrixWorld );
+        this.controls.movementSpeed = -15;  // pull back from explosion
+        this.explosion = 150;
+        // /textchimp
+
+        // this.doExplode = true;
+
         // window.airplane.position.y = +1
         // this.blocks[i].cube.position = window
         //this.camera.position.y = 100;
        // glScene.camera.position.z = -100;
        // glScene.camera.position.x = -100;
-        this.explosion = true;
 
       } else if ( intersects[ 0 ].distance < 300 && intersects[ 0 ].object.name === "airplane-enemy"){
         console.log(`%c ENEMY IN SIGHT!! ${intersects[ 0 ].object.name}`, 'color: orange');
       }
     }
 
+    // textchimp
     if (this.explosion){
       for (let i = 0; i < this.blockCount; i++) {
         this.blocks[i].loop();
         // this.blocks[i].cube.position.set(window.scene.camera.position);
         // debugger
-
         // console.log('blocks',this.blocks[i]);
-        if (this.blocks[i].ticks >= 150) {
-          this.explosion = this.blocks[i].reset();
+        // if (this.blocks[i].ticks >= 150) {
+        //   this.blocks[i].reset();
+        // }
+      }
+      this.explosion--;
 
-          console.log('thisBLOCKS',this.blocks[i].cube.position);
-
-        }
-      };
+      if(this.explosion === 0){
+        console.log('splode finished!');
+        this.splodeGroup.position.set(10000,10000,10000); // warp whole group to somewhere invisible
+        this.blocks.forEach( b => b.reset() );
+        // respawn plane & camera
+        this.camera.position.set(100, 60, 125);
+        this.camera.children[0].position.set(0, -0.5, -2.2);
+        this.movementSpeed = 20;
+      }
     }
+    // /textchimp
+
     this.renderer.render(this.scene, this.camera);
   }
 
