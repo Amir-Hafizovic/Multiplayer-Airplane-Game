@@ -6,6 +6,7 @@
   "scripts": {
     "start": "concurrently \"nodemon server.js\" \"watchify src/index.js -o public/js/bundle.js -v --d\"",
     "build": "browserify src/index.js | uglifyjs -mc warnings=false > public/js/bundle.min.js",
+    "lint": "eslint . --ext js",
     "test": "npm run build"
   },
   "author": "Or Fleisher <contact@orfleisher.com>",
@@ -22,10 +23,14 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
+    "babel-eslint": "^8.2.2",
     "babel-preset-env": "^1.6.1",
     "babelify": "^8.0.0",
     "browserify": "^15.2.0",
     "concurrently": "^3.5.1",
+    "eslint": "^4.18.2",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.9.0",
     "glslify": "^6.1.0",
     "nodemon": "^1.14.12",
     "uglify-js": "^3.3.9",

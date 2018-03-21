@@ -1,60 +1,59 @@
-//Three.js
+// Three.js
 import * as THREE from 'three';
 import Stats from 'stats.js';
-// import ModelLoader from './modelloader';
+// Event emitter implementation for ES6
+import EventEmitter from 'event-emitter-es6';
 import Background from './background';
 import City from './city';
 import FlyControls from './FlyControls';
 import Explode from './explode';
 FlyControls(THREE);
 
-// Event emitter implementation for ES6
-import EventEmitter from 'event-emitter-es6';
 
 class Scene extends EventEmitter {
-  constructor(domElement = document.getElementById('gl_context'),
-              _width = window.innerWidth,
-              _height = window.innerHeight,
-              hasControls = true,
-              clearColor = 'black'){
-
-    //Since we extend EventEmitter we need to instance it from here
+  constructor(
+    domElement = document.getElementById('gl_context'),
+    _width = window.innerWidth,
+    _height = window.innerHeight,
+    hasControls = true,
+    clearColor = 'black',
+  ) {
+    // Since we extend EventEmitter we need to instance it from here
     super();
 
-    //THREE scene
+    // THREE scene
     this.scene = new THREE.Scene();
 
-    //Utility
+    // Utility
     this.width = _width;
     this.height = _height;
 
-    //THREE Camera
+    // THREE Camera
     this.camera = new THREE.PerspectiveCamera(50, this.width / this.height, 0.1, 1500);
     // window.camera = this.camera;
 
-    //THREE WebGL renderer
+    // THREE WebGL renderer
     this.renderer = new THREE.WebGLRenderer({
-      antialiasing: true
+      antialiasing: true,
     });
 
     // this.renderer.setClearColor(new THREE.Color(clearColor));
 
     this.renderer.setSize(this.width, this.height);
 
-    //Push the canvas to the DOM
+    // Push the canvas to the DOM
     domElement.append(this.renderer.domElement);
 
     this.explosion = false;
 
-    if(hasControls) {
-      // this.controls = new THREE.FirstPersonControls(this.camera, this.renderer.domElement);
+    if (hasControls) {
       this.controls = new THREE.FlyControls(
         this.camera,
         this.renderer.domElement,
-        () => this.emit('userMoved')
+        () => this.emit('userMoved'),
       );
 
-      //this.controls.lookSpeed = 0.15;
+      // this.controls.lookSpeed = 0.15;
       this.controls.dragToLook = false;
       this.controls.rollSpeed = 0.5;
       this.controls.autoForward = true;
@@ -65,39 +64,33 @@ class Scene extends EventEmitter {
     this.raycaster.far = 500;
     this.mouse = new THREE.Vector2();
 
-    window.addEventListener( 'mousemove', e => this.onMouseMove(e), false );
+    window.addEventListener('mousemove', e => this.onMouseMove(e), false);
 
-    //Setup event listeners for events and handle the states
+    // Setup event listeners for events and handle the states
     window.addEventListener('resize', e => this.onWindowResize(e), false);
     domElement.addEventListener('mouseenter', e => this.onEnterCanvas(e), false);
     domElement.addEventListener('mouseleave', e => this.onLeaveCanvas(e), false);
     // window.addEventListener('keydown', e => this.onKeyDown(e), false);
 
-    // this.helperGrid = new THREE.GridHelper( 50, 50 );
-    // this.helperGrid.position.y = -0.5;
-    // this.scene.add(this.helperGrid);
-
     this.clock = new THREE.Clock();
-
-    // const modell = new ModelLoader(this.scene)
-
 
     const bg = new Background(this.scene);
     const city = new City(this.scene, this.renderer);
 
-    this.blocks = new Array();
-		this.blockCount = 30;
-
-    this.splodeGroup = new THREE.Object3D(); // textchimp
+    this.blocks = [];
+    this.blockCount = 30;
+    // textchimp add cubes to group
+    this.splodeGroup = new THREE.Object3D();
     for (let i = 0; i < this.blockCount; i++) {
-			this.block = new Explode(this.scene);
-      this.splodeGroup.add( this.block.cube );  // textchimp
+      this.block = new Explode(this.scene);
+      this.splodeGroup.add(this.block.cube);
       this.blocks.push(this.block);
-		}
-    console.log('THIS.BLOCK', this.block);
-    this.scene.add(this.splodeGroup);  // textchimp
+    }
 
-    this.addStats = function(){
+    // add group to scene
+    this.scene.add(this.splodeGroup);
+
+    this.addStats = function () {
       const stats = new Stats();
       stats.setMode(0);
       stats.domElement.style.position = 'absolute';
@@ -111,91 +104,64 @@ class Scene extends EventEmitter {
     this.stats = this.addStats();
 
     this.update();
-
   }
 
 
-  update(){
+  update() {
     requestAnimationFrame(() => this.update());
     this.stats.update();
 
     this.controls.update(this.clock.getDelta());
-    this.controls.target = new THREE.Vector3(0,0,0);
+    this.controls.target = new THREE.Vector3(0, 0, 0);
 
-    if( window.airplane ) {
+    if (window.airplane) {
       window.airplane.children[6].rotation.x += 0.9;
     }
     // console.log(window.airplane);
     this.render();
-
   }
 
   render() {
     // update the picking ray with the camera and mouse position
-	// this.raycaster.setFromCamera( this.mouse, this.camera );
-	this.raycaster.set( this.camera.getWorldPosition(), this.camera.getWorldDirection() );
+    this.raycaster.set(this.camera.getWorldPosition(), this.camera.getWorldDirection());
 
-	// calculate objects intersecting the picking ray
-	var intersects = this.raycaster.intersectObjects( this.scene.children );
-  //   this.scene.children.filter( obj => {
-  //   return obj.name === "City" || obj.name === "airplane-enemy";
-  // }));
-    // console.log(intersects.length);
+    // calculate objects intersecting the picking ray
+    const intersects = this.raycaster.intersectObjects(this.scene.children);
 
-    // raycaster ARROW
-  // this.scene.remove ( this.arrow );
-  // this.arrow = new THREE.ArrowHelper( this.camera.getWorldDirection(), this.camera.getWorldPosition(), 100, Math.random() * 0xffffff );
-  // this.scene.add( this.arrow );
-
-    if(intersects.length){
-
-      if( intersects[ 0 ].object.name === "City" && intersects[ 0 ].distance <= 5 ){
+    if (intersects.length) {
+      if (intersects[0].object.name === 'City' && intersects[0].distance <= 5) {
         console.log('Building hit!!');
 
-        // textchimp
+        // replace plane with exploding blocks
         this.camera.children[0].position.set(1000, 1000, 1000);
-        this.splodeGroup.position.setFromMatrixPosition( this.camera.matrixWorld );
-        this.controls.movementSpeed = -15;  // pull back from explosion
+        this.splodeGroup.position.setFromMatrixPosition(this.camera.matrixWorld);
+        // pull back from explosion
+        this.controls.movementSpeed = -15;
         this.explosion = 150;
-        // /textchimp
-
-        // this.doExplode = true;
-
-        // window.airplane.position.y = +1
-        // this.blocks[i].cube.position = window
-        //this.camera.position.y = 100;
-       // glScene.camera.position.z = -100;
-       // glScene.camera.position.x = -100;
-
-      } else if ( intersects[ 0 ].distance < 300 && intersects[ 0 ].object.name === "airplane-enemy"){
-        console.log(`%c ENEMY IN SIGHT!! ${intersects[ 0 ].object.name}`, 'color: orange');
+      }
+      else if (intersects[0].distance < 300 && intersects[0].object.name === 'airplane-enemy') {
+        console.log(`%c ENEMY IN SIGHT!! ${intersects[0].object.name}`, 'color: orange');
       }
     }
 
-    // textchimp
-    if (this.explosion){
+    // explosion
+    if (this.explosion) {
       for (let i = 0; i < this.blockCount; i++) {
         this.blocks[i].loop();
-        // this.blocks[i].cube.position.set(window.scene.camera.position);
-        // debugger
-        // console.log('blocks',this.blocks[i]);
-        // if (this.blocks[i].ticks >= 150) {
-        //   this.blocks[i].reset();
-        // }
       }
       this.explosion--;
 
-      if(this.explosion === 0){
+      if (this.explosion === 0) {
         console.log('splode finished!');
-        this.splodeGroup.position.set(10000,10000,10000); // warp whole group to somewhere invisible
-        this.blocks.forEach( b => b.reset() );
+        // warp whole group to somewhere invisible
+        this.splodeGroup.position.set(10000, 10000, 10000);
+        this.blocks.forEach(b => b.reset());
         // respawn plane & camera
         this.camera.position.set(100, 60, 125);
         this.camera.children[0].position.set(0, -0.5, -2.2);
         this.movementSpeed = 20;
       }
     }
-    // /textchimp
 
     this.renderer.render(this.scene, this.camera);
   }
@@ -208,20 +174,17 @@ class Scene extends EventEmitter {
     this.renderer.setSize(this.width, this.height);
   }
 
-  onLeaveCanvas(e){
+  onLeaveCanvas(e) {
     this.controls.enabled = false;
   }
-  onEnterCanvas(e){
+  onEnterCanvas(e) {
     this.controls.enabled = true;
   }
-  onMouseMove ( event ) {
-
-        // calculate mouse position in normalized device coordinates
-        // (-1 to +1) for both components
-
-        this.mouse.x = ( event.clientX / this.width ) * 2 - 1;
-        this.mouse.y = - ( event.clientY / this.height ) * 2 + 1;
-
+  onMouseMove(event) {
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+    this.mouse.x = (event.clientX / this.width) * 2 - 1;
+    this.mouse.y = -(event.clientY / this.height) * 2 + 1;
   }
   // onKeyDown(e){
   //   this.emit('userMoved');
