@@ -16,7 +16,6 @@ class Scene extends EventEmitter {
     _width = window.innerWidth,
     _height = window.innerHeight,
     hasControls = true,
-    clearColor = 'black',
   ) {
     // Since we extend EventEmitter we need to instance it from here
     super();
@@ -30,14 +29,11 @@ class Scene extends EventEmitter {
 
     // THREE Camera
     this.camera = new THREE.PerspectiveCamera(50, this.width / this.height, 0.1, 1500);
-    // window.camera = this.camera;
 
     // THREE WebGL renderer
     this.renderer = new THREE.WebGLRenderer({
       antialiasing: true,
     });
-
-    // this.renderer.setClearColor(new THREE.Color(clearColor));
 
     this.renderer.setSize(this.width, this.height);
 
@@ -53,11 +49,9 @@ class Scene extends EventEmitter {
         () => this.emit('userMoved'),
       );
 
-      // this.controls.lookSpeed = 0.15;
       this.controls.dragToLook = false;
       this.controls.rollSpeed = 0.5;
       this.controls.autoForward = true;
-      // this.controls.movementSpeed = 20;
     }
 
     this.raycaster = new THREE.Raycaster();
@@ -70,12 +64,13 @@ class Scene extends EventEmitter {
     window.addEventListener('resize', e => this.onWindowResize(e), false);
     domElement.addEventListener('mouseenter', e => this.onEnterCanvas(e), false);
     domElement.addEventListener('mouseleave', e => this.onLeaveCanvas(e), false);
-    // window.addEventListener('keydown', e => this.onKeyDown(e), false);
 
     this.clock = new THREE.Clock();
 
+    /* eslint-disable no-unused-vars */
     const bg = new Background(this.scene);
     const city = new City(this.scene, this.renderer);
+    /* eslint-enable no-unused-vars */
 
     this.blocks = [];
     this.blockCount = 30;
@@ -117,22 +112,21 @@ class Scene extends EventEmitter {
     if (window.airplane) {
       window.airplane.children[6].rotation.x += 0.9;
     }
-    // console.log(window.airplane);
     this.render();
   }
 
   render() {
-    // update the picking ray with the camera and mouse position
+    // Update the picking ray with the camera and mouse position
     this.raycaster.set(this.camera.getWorldPosition(), this.camera.getWorldDirection());
 
-    // calculate objects intersecting the picking ray
+    // Calculate objects intersecting the picking ray
     const intersects = this.raycaster.intersectObjects(this.scene.children);
 
     if (intersects.length) {
       if (intersects[0].object.name === 'City' && intersects[0].distance <= 5) {
         console.log('Building hit!!');
 
-        // replace plane with exploding blocks
+        // Replace plane with exploding blocks
         this.camera.children[0].position.set(1000, 1000, 1000);
         this.splodeGroup.position.setFromMatrixPosition(this.camera.matrixWorld);
         // pull back from explosion
@@ -144,7 +138,7 @@ class Scene extends EventEmitter {
       }
     }
 
-    // explosion
+    // Explosion
     if (this.explosion) {
       for (let i = 0; i < this.blockCount; i++) {
         this.blocks[i].loop();
@@ -153,10 +147,10 @@ class Scene extends EventEmitter {
 
       if (this.explosion === 0) {
         console.log('splode finished!');
-        // warp whole group to somewhere invisible
+        // Warp whole group to somewhere invisible
         this.splodeGroup.position.set(10000, 10000, 10000);
         this.blocks.forEach(b => b.reset());
-        // respawn plane & camera
+        // Respawn plane & camera
         this.camera.position.set(100, 60, 125);
         this.camera.children[0].position.set(0, -0.5, -2.2);
         this.movementSpeed = 20;
@@ -166,7 +160,7 @@ class Scene extends EventEmitter {
     this.renderer.render(this.scene, this.camera);
   }
 
-  onWindowResize(e) {
+  onWindowResize() {
     this.width = window.innerWidth;
     this.height = Math.floor(window.innerHeight - (window.innerHeight * 0.3));
     this.camera.aspect = this.width / this.height;
@@ -174,21 +168,18 @@ class Scene extends EventEmitter {
     this.renderer.setSize(this.width, this.height);
   }
 
-  onLeaveCanvas(e) {
+  onLeaveCanvas() {
     this.controls.enabled = false;
   }
-  onEnterCanvas(e) {
+  onEnterCanvas() {
     this.controls.enabled = true;
   }
   onMouseMove(event) {
-    // calculate mouse position in normalized device coordinates
+    // Calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
     this.mouse.x = (event.clientX / this.width) * 2 - 1;
     this.mouse.y = -(event.clientY / this.height) * 2 + 1;
   }
-  // onKeyDown(e){
-  //   this.emit('userMoved');
-  // }
 }
 
 export default Scene;

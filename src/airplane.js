@@ -9,8 +9,8 @@ class AirPlane {
     const geomCockpitTail = new THREE.BoxGeometry(130, 40, 40, 1, 1, 1);
     const matCockpitTail = new THREE.MeshPhongMaterial({ color, flatShading: THREE.FlatShading });
 
-    // we can access a specific vertex of a shape through
-    // the vertices array, and then move its x, y and z property:
+    // We can access a specific vertex of a shape through
+    // The vertices array, and then move its x, y and z property:
     geomCockpitTail.vertices[4].y -= 10;
     geomCockpitTail.vertices[4].z += 20;
     geomCockpitTail.vertices[5].y -= 10;
@@ -46,15 +46,6 @@ class AirPlane {
     engine.receiveShadow = true;
     this.mesh.add(engine);
 
-    // Create top wing
-    // var geomTopWing = new THREE.BoxGeometry(40, 2, 200, 1, 1, 1)
-    // var matTopWing = new THREE.MeshPhongMaterial({color: color, shading: THREE.FlatShading})
-    // var topWing = new THREE.Mesh(geomTopWing, matTopWing)
-    // topWing.castShadow = true
-    // topWing.receiveShadow = true
-    // topWing.position.set(20, 50, 0)
-    // this.mesh.add(topWing)
-
     // Create bottom wing
     const geomBottomWing = new THREE.BoxGeometry(40, 2, 200, 1, 1, 1);
     const matBottomWing = new THREE.MeshPhongMaterial({ color, flatShading: THREE.FlatShading });
@@ -63,20 +54,6 @@ class AirPlane {
     bottomWing.receiveShadow = true;
     bottomWing.position.set(10, -10, 0);
     this.mesh.add(bottomWing);
-
-    // Wing support
-    // var geomWingSupport = new THREE.BoxGeometry(2, 60, 2, 1, 1, 1)
-    // var matWingSupport = new THREE.MeshPhongMaterial({color: color, shading: THREE.FlatShading})
-    // var wingSupportLeft = new THREE.Mesh(geomWingSupport, matWingSupport)
-    // wingSupportLeft.castShadow = true
-    // wingSupportLeft.receiveShadow = true
-    // wingSupportLeft.position.set(15, 20, -80)
-    // this.mesh.add(wingSupportLeft)
-    // var wingSupportRight = new THREE.Mesh(geomWingSupport, matWingSupport)
-    // wingSupportRight.castShadow = true
-    // wingSupportRight.receiveShadow = true
-    // wingSupportRight.position.set(15, 20, 80)
-    // this.mesh.add(wingSupportRight)
 
     // Create the tail
     const geomTailPlane = new THREE.BoxGeometry(30, 25, 2, 1, 1, 1);
@@ -96,7 +73,7 @@ class AirPlane {
     tailWing.position.set(-110, 11, 0);
     this.mesh.add(tailWing);
 
-    // propeller
+    // Create the propeller
     const geomPropeller = new THREE.BoxGeometry(20, 10, 10, 1, 1, 1);
     geomPropeller.vertices[4].y -= 5;
     geomPropeller.vertices[4].z += 5;
@@ -137,19 +114,10 @@ class AirPlane {
     this.propeller.position.set(50, 0, 0);
     this.mesh.add(this.propeller);
 
-    // rotate the geometry on the Y axis away from the camera
-    // this.mesh.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI / 2))
-
-
-    // change rotation order to avoid gimbal lock
+    // Change rotation order to avoid gimbal lock
     this.mesh.rotation.order = 'XYZ';
     this.mesh.rotation.y = 0.5 * Math.PI;
     this.mesh.scale.set(0.01, 0.01, 0.01);
-
-
-    // while (true){
-    //     this.mesh.propeller.rotation.x += 0.3
-    // };
   }
 }
 

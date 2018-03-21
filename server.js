@@ -1,54 +1,48 @@
-'use strict'
-
-//////EXPRESS////////
+// ////EXPRESS////////
 const express = require('express');
 const app = express();
 
-////////HTTP/////////
-const http = require('http').createServer(app);
-
-//Port and server setup
+// Port and server setup
 const port = process.env.PORT || 1989;
 
-//Server
+// Server
 const server = app.listen(port);
 
-//Console the port
-console.log('Server is running localhost on port: ' + port );
+// Console the port
+console.log(`Server is running localhost on port: ${port}`);
 
-/////SOCKET.IO///////
+// ///SOCKET.IO///////
 const io = require('socket.io').listen(server);
 
-////////EJS//////////
+// //////EJS//////////
 const ejs = require('ejs');
 
-//Setup the views folder
-app.set("views", __dirname + '/views');
+// Setup the views folder
+app.set('views', `${__dirname}/views`);
 
-//Setup ejs, so I can write HTML(:
+// Setup ejs, so I can write HTML(:
 app.engine('.html', ejs.__express);
 app.set('view-engine', 'html');
 
-//Setup the public client folder
-app.use(express.static(__dirname + '/public'));
+// Setup the public client folder
+app.use(express.static(`${__dirname}/public`));
 
-let clients = {}
+const clients = {};
 
-//Socket setup
+// Socket setup
 io.on('connection', client => {
+  console.log(`User ${client.id} connected, there are ${io.engine.clientsCount} clients connected`);
 
-  console.log('User ' + client.id + ' connected, there are ' + io.engine.clientsCount + ' clients connected');
-
-  //Add a new client indexed by his id
+  // Add a new client indexed by his id
   clients[client.id] = {
     position: [0, 0, 0],
-    rotation: [0, 0, 0]
-  }
+    rotation: [0, 0, 0],
+  };
 
-  //Make sure to send the client it's ID
+  // Make sure to send the client it's ID
   client.emit('introduction', client.id, io.engine.clientsCount, Object.keys(clients));
 
-  //Update everyone that the number of users has changed
+  // Update everyone that the number of users has changed
   io.sockets.emit('newUserConnected', io.engine.clientsCount, client.id, Object.keys(clients));
 
   client.on('move', (pos, rot) => {
@@ -57,34 +51,27 @@ io.on('connection', client => {
     io.sockets.emit('userPositions', clients);
   });
 
-  //Handle the disconnection
+  // Handle the disconnection
   client.on('disconnect', () => {
-
-    //Delete this client from the object
+    // Delete this client from the object
     delete clients[client.id];
 
     io.sockets.emit('userDisconnected', io.engine.clientsCount, client.id, Object.keys(clients));
 
-    console.log('User ' + client.id + ' dissconeted, there are ' + io.engine.clientsCount + ' clients connected');
-
+    console.log(`User ${client.id} dissconeted, there are ${io.engine.clientsCount} clients connected`);
   });
-
 });
 
-/////////////////////
-//////ROUTER/////////
-/////////////////////
+// ///////////////////
+// ////ROUTER/////////
+// ///////////////////
 
-//Client view
+// Client view
 app.get('/', (req, res) => {
-
-	res.render('index.html');
-
+  res.render('index.html');
 });
 
-//404 view
+// 404 view
 app.get('/*', (req, res) => {
-
-	res.render('404.html');
-
+  res.render('404.html');
 });
